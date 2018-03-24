@@ -19,6 +19,8 @@ from pyllist import dllist, dllistnode
 import midi
 import sys
 import curses
+import os
+import termios, tty
 
 stdscr = curses.initscr()
 curses.noecho()
@@ -31,7 +33,7 @@ if len(sys.argv) != 2:
     print "Usage: {0} <midifile>".format(sys.argv[0])
     sys.exit(2)
 '''
-midifile = "c-major-scale.mid"
+midifile = ""
 #print(pattern)
 
 # LED strip configuration:
@@ -214,6 +216,44 @@ def convertPattern(pattern, bpm):
                     yield x
             #elif isinstance(event, midi.events.EndOfTrackEvent):
             #    yield (None, None, None)
+def displaymenu():
+	for i in range (16):
+		stdscr.addstr(i,0,"\n")
+
+	stdscr.addstr(0,0,"Welcome!")
+	path = os.path.join(os.getcwd(), "MidFiles")
+	mid_files = os.listdir(path)
+
+	index = 0
+	stdscr.addstr(1,0,"Please select a song:")
+	end = False
+	while not end:
+		char = getch()
+
+		if (char == "a"):
+			index = (index - 1)%(len(mid_files))
+		if (char == "d"):
+			index = (index + 1)%(len(mid_files))
+		if (char == "s"):
+			end = True
+
+		stdscr.addstr(2,0,mid_files[index]+"\n")
+		stdscr.refresh()
+
+	return os.path.join(path, mid_files[index])
+
+def getch():
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(1)
+ 
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
+
+
                 
 '''
 def lighttest(strip):
@@ -225,7 +265,6 @@ def lighttest(strip):
 def resetall(strip):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))        
-
 def update(strip, data, bpm=120.0):
     start, stop, pitch = data
     bpm = 60.0/bpm
@@ -249,5 +288,6 @@ def update(strip, data, bpm=120.0):
         notepos += (time.time()-timestart) / (bpm) * 4 #time elapsed / time per beat * leds per beat
 '''
 if __name__ == '__main__':
-    main()
-    
+	while True:
+		midifile = displaymenu()
+		main()
