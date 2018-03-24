@@ -31,11 +31,11 @@ if len(sys.argv) != 2:
     print "Usage: {0} <midifile>".format(sys.argv[0])
     sys.exit(2)
 '''
-midifile = "dq.mid"
+midifile = "c-major-scale.mid"
 #print(pattern)
 
 # LED strip configuration:
-LED_COUNT = 50      # Number of LED pixels.
+LED_COUNT = 100      # Number of LED pixels.
 LED_PIN = 18      # GPIO pin connected to the pixels (must support PWM!).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 10       # DMA channel to use for generating signal (try 10)
@@ -57,7 +57,7 @@ def main():
     # Intialize the library (must be called once before other functions).
     #strip.begin()
     #strip.setBrightness(20)
-    strip = [' '] * 50
+    strip = [' '] * LED_COUNT
     '''
     lighttest(strip)
     resetall(strip)
@@ -79,26 +79,26 @@ def main():
     starttime = time.time()+START_DELAY
     while (i < len(notes) or len(renderlist)) :
         #print(i)
-        stdscr.addstr(11,0,"        ")
-        stdscr.addstr(10,0,"        ")
-        stdscr.addstr(9,0,"        ")
-        stdscr.addstr(7,0,"        ")
-        stdscr.addstr(8,0,"        ")
+        stdscr.addstr(15,0,"            ")
+        #stdscr.addstr(10,0,"        ")
+        #stdscr.addstr(9,0,"        ")
+        #stdscr.addstr(7,0,"        ")
+        #stdscr.addstr(8,0,"        ")
         while i < len(notes) and notes[i][0] < (time.time() - starttime) + spl * 8: #render one bar before press (one strip of LEDs)
             #print(notes[i][0], time.time() - starttime)
-            stdscr.addstr(10,0,"add")
+            #stdscr.addstr(10,0,"add")
             renderlist.append(Note(strip, notes[i], starttime, spl)) #TODO: might lag if notes are faster than it can render!
             i += 1
         stdscr.addstr(15, 0, str(time.time() - starttime))
         for node in renderlist.iternodes():
             if not node.value.updateNote(): #rendersNote and returns whether or not note is still within scope
                 renderlist.remove(node)
-                stdscr.addstr(9,0,"remove")
+                #stdscr.addstr(9,0,"remove")
         #print([strip.getPixelColor(x) for x in range(strip.numPixels())])    
-        for x in range(0, 50/8):
+        for x in range(0, LED_COUNT/8):
             stdscr.addstr(x, 0, str(strip[x*8:(x+1)*8]))
-        stdscr.addstr(7,0,str(i) + " / " + str(len(notes)))
-        stdscr.addstr(8,0,str(len(renderlist)))
+        #stdscr.addstr(7,0,str(i) + " / " + str(len(notes)))
+        #stdscr.addstr(8,0,str(len(renderlist)))
         stdscr.refresh()
         # for z in range(len(strip)):
         #     strip[z] = ' '
@@ -118,8 +118,8 @@ class Note:
         self.flipped = (self.pitch % 2 == 0) #the hardware leds flip orientation every eight
         self.flipped = False
         #self.flipped = False #remove
-        if self.offset > 50 - 8: #remove
-            self.offset -= 48
+        if self.offset > LED_COUNT - 8: #remove
+            self.offset -= LED_COUNT- 4
             #self.offset = 0 #remove
         self.start += starttime                   #start of note press
         self.stop += starttime                    #end of note press
