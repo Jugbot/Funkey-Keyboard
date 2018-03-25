@@ -104,7 +104,7 @@ class Note:
         r,g,b = [int(256*i) for i in colorsys.hls_to_rgb(rcol,0.5,1.0)] 
         self.color = Color(r, g, b)
         '''
-        self.color = Color(255,255,255)
+        self.color = Color(255,0,0)
         #used by rendering
         self.laststart = 7
         self.laststop = 7
@@ -145,9 +145,9 @@ class Note:
         if absLED > 0:
             cval = int(256*remLED)
             if self.flipped:
-                self.strip.setPixelColor(7-(absLED-1) + self.offset, Color(cval,cval,cval))
+                self.strip.setPixelColor(7-(absLED-1) + self.offset, Color(cval,0,0))
             else:
-                self.strip.setPixelColor(absLED-1 + self.offset, Color(cval,cval,cval))
+                self.strip.setPixelColor(absLED-1 + self.offset, Color(cval,0,0))
         
         lastnote = absLED        
         
@@ -193,37 +193,52 @@ def resetall(strip):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))
     strip.show()
+    
+def displayLED(scrolling, strip):
+    text = scrollingtext.LEDText(scrolling)
+    
+    while True:
+        for ctr in range(text.loopcount()):
+            curr_view = text.currentView()
+            
+            for i in range(strip.numPixels()):
+                strip.setPixelColor(i, Color(0, 0, 0))
 
+            for i in range(len(curr_view)):
+                if not mcp.input(SELECT):
+                    return SELECT
+                if not mcp.input(LEFT):
+                    return LEFT
+                if not mcp.input(RIGHT):
+                    return RIGHT
+                if(curr_view[i]):
+                    strip.setPixelColor(i, Color(200,0,0))
+            strip.show()
+            time.sleep(0.2)
+            
+            
+        
 def displaymenu(strip):
     path = os.path.join(os.getcwd(), "MidFiles")
     mid_files = os.listdir(path)
 
     index = 0
+    
+    displayLED("Please select a song", strip)
     resetall(strip)
     
-    text = scrollingtext.LEDText("Please select a song:")
-    
-    for ctr in range(text.loopcount()):
-        curr_view = text.currentView()
+    end = False
+    while not end:
+            
+        dir = displayLED(mid_files[index].split(".mid")[0], strip)
+        resetall(strip)
 
-        for i in range(strip.numPixels()):
-            if(curr_view[i]):
-                strip.setPixelColor(i, Color(255,255,255))
-        strip.show()
-        time.sleep(0.3)
-        
-        end = False
-        while not end:
-            left = mcp.input(LEFT)
-            select = mcp.input(SELECT)
-            right = mcp.input(RIGHT)
-
-            if (left):
-                index = (index - 1)%(len(mid_files))
-            elif (right):
-                index = (index + 1)%(len(mid_files))
-            elif (select):
-                end = True
+        if (dir == LEFT):
+            index = (index - 1)%(len(mid_files))
+        elif (dir == RIGHT):
+            index = (index + 1)%(len(mid_files))
+        elif (dir == SELECT):
+            end = True
         
     return os.path.join(path, mid_files[index])
 
