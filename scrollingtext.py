@@ -131,37 +131,11 @@ class LEDText:
       self.lst.extend(LIBRARY[i][::-1])
     # print self.lst
     self.index = 0
-
+    
+    def loopcount(self):
+        return len(self.lst)/self.row/self.col
+    
   def currentView(self):
     templst = self.lst[(self.index) : ((self.row*self.col)+self.index)][::-1]
     self.index = (self.index + self.row) % len(self.lst)
     return templst
-
-  def display(self):
-    count = self.row*self.col
-    switch = False
-    while (count <= len(self.lst)):
-      os.system('cls' if os.name=='nt' else 'clear')
-      lst = self.currentView()
-      for i in range(12):
-        s = ""
-        for j in range(i*8, (i+1) * 8):
-          if not switch:
-            if lst[j]:
-              s += "0 "
-            else:
-              s += "  "
-          else:
-            if lst[j]:
-              s = "0 " + s
-            else:
-              s = "  " + s
-        print s
-        switch = not switch
-      time.sleep(0.5)
-      switch = not switch
-      count += self.row
-
-
-thing = LEDText("hello")
-thing.display()

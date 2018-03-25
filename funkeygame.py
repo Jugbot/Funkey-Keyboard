@@ -1,10 +1,17 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 # rhythm game using ws2811 rgb leds
 # format > python funkeygame.py <filename.mid>
-
-import time
-import datetime
+import RPi.GPIO
+import MCP230xx
 import math
+import time
+
+import Adafruit_GPIO as GPIO
+import Adafruit_GPIO.I2C as I2C
+
+mcp = MCP230xx.MCP23017()
+
+import datetime
 from random import random,seed
 import colorsys
 from threading import Thread
@@ -16,15 +23,19 @@ import sys
 
 from neopixel import *
 
-if len(sys.argv) != 2:
-    print "Usage: {0} <midifile>".format(sys.argv[0])
-    sys.exit(2)
+import scrollingtext
+# Use busnum = 0 for older Raspberry Pi's (256MB)
+#mcp = Adafruit_MCP230XX(busnum = 0, address = 0x20, num_gpios = 16)
 
-midifile = sys.argv[1]
+# Set pins 0, 1 and 2 to output (you can set pins 0..15 this way)
+for i in range(12):
+    mcp.setup(i, GPIO.IN)
+    mcp.pullup(i,True)
+
 #print(pattern)
 seed(time.time())
 # LED strip configuration:
-LED_COUNT = 50      # Number of LED pixels.
+LED_COUNT = 100      # Number of LED pixels.
 LED_PIN = 18      # GPIO pin connected to the pixels (must support PWM!).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 10       # DMA channel to use for generating signal (try 10)
@@ -32,19 +43,26 @@ LED_BRIGHTNESS = 64  # Set to 0 for darkest and 255 for brightest
 # True to invert the signal (when using NPN transistor level shift)
 LED_INVERT = False
 
+LEFT = 0
+SELECT = 1
+RIGHT = 2
+
 START_DELAY = 3.0 #three seconds before song starts
 
 def main():
+    
+    # Create NeoPixel object with appropriate configuration.
+    strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
+    # Intialize the library (must be called once before other functions).
+    strip.begin()
+    midifile = displaymenu(strip)        
     #read midi file and convert from relative time to absolute
     pattern = midi.read_midifile(midifile)
     pattern.make_ticks_abs()
     #convert beats per minute to seconds per LED
     bpm = 120.0
     spl = 60.0/bpm/2
-    # Create NeoPixel object with appropriate configuration.
-    strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
-    # Intialize the library (must be called once before other functions).
-    strip.begin()
+    
     #convert midi events into an easier to read format
     notes = list(convertPattern(pattern, bpm))
     notes.sort()
@@ -74,8 +92,8 @@ class Note:
         self.start, self.stop, self.pitch = data
         self.offset = self.pitch % 12 * 8 #0-95
         self.flipped = (self.pitch % 2 == 0) #the hardware leds flip orientation every eight
-        if self.offset > 50 - 8: #remove
-            self.offset -= 48
+        if self.offset > 100 - 8: #remove
+            self.offset -= 96
         self.start += starttime                   #start of note press
         self.stop += starttime                    #end of note press
         self.spl = spl                     #seconds per led (one led = one eighth note or 1/2 beat)
@@ -174,7 +192,41 @@ def resetall(strip):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))
     strip.show()
+
+def displaymenu(strip):
+    path = os.path.join(os.getcwd(), "MidFiles")
+    mid_files = os.listdir(path)
+
+    index = 0
+    resetall(strip)
     
+    text = scrollingtext.LEDText("Please select a song:")
+    
+    for ctr in range(text.loopcount()):
+        curr_view = text.currentView()
+
+        for i in range(strip.numPixels()):
+            if(curr_view[i]):
+                strip.setPixelColor(i, Color(255,255,255))
+        strip.show()
+        time.sleep(0.3)
+        
+        end = False
+        while not end:
+            left = mcp.input(LEFT)
+            select = mcp.input(SELECT)
+            right = mcp.input(RIGHT)
+
+            if (left):
+                index = (index - 1)%(len(mid_files))
+            elif (right):
+                index = (index + 1)%(len(mid_files))
+            elif (select):
+                end = True
+        
+    return os.path.join(path, mid_files[index])
+
 if __name__ == '__main__':
-    main()
+    while True:
+        main()
     
