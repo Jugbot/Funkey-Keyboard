@@ -40,7 +40,7 @@ LED_COUNT = 100      # Number of LED pixels.
 LED_PIN = 18      # GPIO pin connected to the pixels (must support PWM!).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 10       # DMA channel to use for generating signal (try 10)
-LED_BRIGHTNESS = 64  # Set to 0 for darkest and 255 for brightest
+LED_BRIGHTNESS = 255  # Set to 0 for darkest and 255 for brightest
 # True to invert the signal (when using NPN transistor level shift)
 LED_INVERT = False
 
@@ -72,9 +72,9 @@ def main():
     i=0
     starttime = time.time()+START_DELAY
     while i < len(notes) or len(renderlist):
-        #print(i)
+        print(i)
         while i < len(notes) and notes[i][0] < (time.time() - starttime) + spl * 8: #render one bar before press (one strip of LEDs)
-            #print(notes[i][0], time.time() - starttime)
+            print(notes[i][0], time.time() - starttime)
             renderlist.append(Note(strip, notes[i], starttime, spl)) #TODO: might lag if notes are faster than it can render!
             i += 1
         for node in renderlist.iternodes():
@@ -85,6 +85,7 @@ def main():
         time.sleep(0.1)
     
     resetall(strip)
+    strip.show()
 
     
 class Note:
@@ -104,7 +105,7 @@ class Note:
         r,g,b = [int(256*i) for i in colorsys.hls_to_rgb(rcol,0.5,1.0)] 
         self.color = Color(r, g, b)
         '''
-        self.color = Color(255,0,0)
+        self.color = Color(255,255,255)
         #used by rendering
         self.laststart = 7
         self.laststop = 7
@@ -141,14 +142,14 @@ class Note:
                 self.strip.setPixelColor(7-ledind + self.offset, color)                        
             else:
                 self.strip.setPixelColor(ledind + self.offset, color)
-            
+        '''    
         if absLED > 0:
             cval = int(256*remLED)
             if self.flipped:
-                self.strip.setPixelColor(7-(absLED-1) + self.offset, Color(cval,0,0))
+                self.strip.setPixelColor(7-(absLED-1) + self.offset, Color(cval,cval,cval))
             else:
-                self.strip.setPixelColor(absLED-1 + self.offset, Color(cval,0,0))
-        
+                self.strip.setPixelColor(absLED-1 + self.offset, Color(cval,cval,cval))
+        '''
         lastnote = absLED        
         
 def secondsPerTick(bpm, res):
