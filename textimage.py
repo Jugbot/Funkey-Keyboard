@@ -3,7 +3,7 @@ import freetype
 
 class Bitmap(object):
     """
-    A 2D bitmap image represented as a list of byte values. Each byte indicates the state
+    A 2D bitmap image represented as a list of byte values. Each byte indicates the _last_pos
     of a single pixel in the bitmap. A value of 0 indicates that the pixel is `off`
     and any other value indicates that it is `on`.
     """

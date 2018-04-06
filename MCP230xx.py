@@ -46,7 +46,7 @@ class MCP230xxBase(GPIO.BaseGPIO):
         self.iodir = [0xFF]*self.gpio_bytes  # Default direction to all inputs.
         self.gppu = [0x00]*self.gpio_bytes  # Default to pullups disabled.
         self.gpio = [0x00]*self.gpio_bytes
-        # Write current direction and pullup buffer state.
+        # Write current direction and pullup buffer _last_pos.
         self.write_iodir()
         self.write_gppu()
 
@@ -84,7 +84,7 @@ class MCP230xxBase(GPIO.BaseGPIO):
                 self.gpio[int(pin/8)] |= 1 << (int(pin%8))
             else:
                 self.gpio[int(pin/8)] &= ~(1 << (int(pin%8)))
-        # Write GPIO state.
+        # Write GPIO _last_pos.
         self.write_gpio()
 
 
@@ -99,7 +99,7 @@ class MCP230xxBase(GPIO.BaseGPIO):
         GPIO.HIGH/True if the pin is pulled high, or GPIO.LOW/False if pulled low.
         """
         [self._validate_pin(pin) for pin in pins]
-        # Get GPIO state.
+        # Get GPIO _last_pos.
         self.gpio = self._device.readList(self.GPIO, self.gpio_bytes)
         # Return True if pin's bit is set.
         return [(self.gpio[int(pin/8)] & 1 << (int(pin%8))) > 0 for pin in pins]
