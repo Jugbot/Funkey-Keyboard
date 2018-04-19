@@ -14,18 +14,19 @@ from neopixel import *
 from pyllist import dllist
 
 # Set the port expander global variable
-mcp = MCP230xx.MCP23017()
+#mcp = MCP230xx.MCP23017()
 
 # Set pins 0-11 to output and pullup(you can set pins 0..15 this way)
 for i in xrange(12):
-    mcp.setup(i, GPIO.IN)
-    mcp.pullup(i, True)
+    pass
+    #mcp.setup(i, GPIO.IN)
+    #mcp.pullup(i, True)
 
 # Seed random
 seed(time.time())
 
 # LED strip configuration:
-LED_COUNT = 100  # Number of LED pixels.
+LED_COUNT = 96  # Number of LED pixels.
 LED_PIN = 18  # GPIO pin connected to the pixels (must support PWM!).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 10  # DMA channel to use for generating signal (try 10)
@@ -40,11 +41,7 @@ RIGHT = 2
 START_DELAY = 3.0
 
 
-def main():
-    # Create NeoPixel object with appropriate configuration.
-    strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
-    # Intialize the library (must be called once before other functions).
-    strip.begin()
+def main(strip):
 
     # Get midi file from menu select
     midifile = songselectmenu(strip)
@@ -85,7 +82,7 @@ def inputloop(args):
     gpio_i = range(12)
     while time.time()-starttime < last_note + hit_tolerance:
         for b_i in gpio_i:
-            state = mcp.input(b_i)
+            state = True#mcp.input(b_i)
             if state != b_state[b_i]:
                 # ( time, button index, state <begin or end> )
                 presses.append((time.time()-starttime, b_i, state))
@@ -247,7 +244,7 @@ def songselectmenu(strip):
     index = 0
     resetall(strip)
 
-    ledtext = LEDText("Please select a song...")
+    ledtext = LEDText("Please select a song...", 12, 8)
     canend = False
     while True:
         ledtext.nextview()
@@ -256,13 +253,12 @@ def songselectmenu(strip):
                 strip.setPixelColor(strip_i, Color(255, 255, 255))
             else:
                 strip.setPixelColor(strip_i, Color(0, 0, 0))
-
         strip.show()
         time.sleep(0.2)
 
-        left = mcp.input(LEFT)
-        select = mcp.input(SELECT)
-        right = mcp.input(RIGHT)
+        left = True#mcp.input(LEFT)
+        select = True#mcp.input(SELECT)
+        right = True#mcp.input(RIGHT)
 
         if (left):
             index = (index - 1) % (len(mid_files))
@@ -284,5 +280,15 @@ def lighttest(strip):
 
 
 if __name__ == '__main__':
-    while True:
-        main()
+    # Create NeoPixel object with appropriate configuration.
+    strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
+    # Intialize the library (must be called once before other functions).
+    strip.begin()
+    try:
+        while True:
+            main(strip)
+    except KeyboardInterrupt:
+        print("W: interrupt received, stopping...")
+    finally:
+        # clean up
+        resetall(strip)
