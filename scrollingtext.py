@@ -31,17 +31,17 @@ class LEDText:
     def __iter__(self): #reversing
         for x in xrange(self.width):
             for y in xrange(self.height):
-                if x % 2 == 0:
-                    yield self.display[x*self.height + y]
+                if x & 1:
+                    yield self.display[(self.scrollindex + x+1) % self.width*self.height + y]
                 else:
-                    yield self.display[x*self.height + (self.height - 1 - y)] #invert column
+                    yield self.display[(self.scrollindex + x+1) % self.width*self.height + (self.height - 1 - y)] #invert column
 
     def nextview(self):
         start = self.scrollindex * self.height
         l2 = next(self.textgen)
         for l_i in xrange(len(l2)):
             self.display[start + l_i] = l2[l_i]
-        self.scrollindex = (self.scrollindex + 1) % self.width
+        self.scrollindex = (self.scrollindex - 1) % self.width
 
 class TextGenerator(object):
     def __init__(self, text):

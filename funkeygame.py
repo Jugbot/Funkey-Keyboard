@@ -235,6 +235,15 @@ def resetall(strip):
         strip.setPixelColor(i, Color(0, 0, 0))
     strip.show()
 
+def wheel(pos):
+	if pos < 85:
+		return Color(pos * 3, 255 - pos * 3, 0)
+	elif pos < 170:
+		pos -= 85
+		return Color(255 - pos * 3, 0, pos * 3)
+	else:
+		pos -= 170
+		return Color(0, pos * 3, 255 - pos * 3)
 
 # Menu, shows scrolling text .split(".")[0]
 def songselectmenu(strip):
@@ -244,17 +253,17 @@ def songselectmenu(strip):
     index = 0
     resetall(strip)
 
-    ledtext = LEDText("Please select a song...", 12, 8)
+    ledtext = LEDText("Select A Song!  ", 12, 8)
     canend = False
     while True:
         ledtext.nextview()
         for strip_i, led in zip(xrange(strip.numPixels()), ledtext):
             if led:
-                strip.setPixelColor(strip_i, Color(255, 255, 255))
+                strip.setPixelColor(strip_i, wheel((strip_i - int(time.time()*100)) & 255))
             else:
-                strip.setPixelColor(strip_i, Color(0, 0, 0))
+                strip.setPixelColor(strip_i, 0)
         strip.show()
-        time.sleep(0.2)
+        time.sleep(0.05)
 
         left = True#mcp.input(LEFT)
         select = True#mcp.input(SELECT)
