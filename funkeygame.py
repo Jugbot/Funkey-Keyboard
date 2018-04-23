@@ -3,7 +3,8 @@
 import math
 import os
 import time
-from random import seed
+import colorsys
+from random import seed, random
 from multiprocessing import Process, Queue
 
 import Adafruit_GPIO as GPIO
@@ -12,6 +13,7 @@ import midi
 from scrollingtext import LEDText
 from neopixel import *
 from pyllist import dllist
+import vlc
 
 # Set the port expander global variable
 #mcp = MCP230xx.MCP23017()
@@ -44,7 +46,12 @@ START_DELAY = 3.0
 def main(strip):
 
     # Get midi file from menu select
-    midifile = songselectmenu(strip)
+    # midifile = songselectmenu(strip)
+    
+    path = os.path.join(os.getcwd(), "MidFiles")
+    file = os.path.splitext(os.listdir(path)[0])[0]
+    midifile = os.path.join(path, file + ".mid")
+    mp3file = os.path.join(path, file + ".mp3")
 
     # read midi file and convert from relative time to absolute
     pattern = midi.read_midifile(midifile)
@@ -61,15 +68,22 @@ def main(strip):
     result = Queue()
     starttime = time.time() + START_DELAY
     # input loop
-    input_thread = Process(target=inputloop, args=(notes, starttime, result))
-    input_thread.start()
+    #input_thread = Process(target=inputloop, args=(notes, starttime, result))
+    #input_thread.start()
     # render loop
+    
+    playsongmp3(mp3file)
     renderloop(notes, spl, strip, starttime)
-    input_thread.join()
+    
+    #input_thread.join()
 
     #end
     resetall(strip)
     strip.show()
+    
+def playsongmp3(url):
+    p = vlc.MediaPlayer(url)
+    p.play()
 
 def inputloop(args):
     notes, starttime, result = args
@@ -115,15 +129,15 @@ def renderloop(notes, spl, strip, starttime):
         # print(i)
         while i < len(notes) and notes[i][0] < (time.time() - starttime) + spl * 8:  # render one bar before press (one strip of LEDs)
             # print(notes[i][0], time.time() - starttime)
-            renderlist.append(
-                Note(strip, notes[i], starttime, spl))  # TODO: might lag if notes are faster than it can render!
+            if notes[i][2] in range(midi.NOTE_NAME_MAP_SHARP['C_5'], midi.NOTE_NAME_MAP_SHARP['C_6']):
+                renderlist.append(
+                    Note(strip, notes[i], starttime, spl))  # TODO: might lag if notes are faster than it can render!
             i += 1
         for node in renderlist.iternodes():
             if not node.value.updateNote():  # rendersNote and returns whether or not note is still within scope
                 renderlist.remove(node)
         # print([strip.getPixelColor(x) for x in xrange(strip.numPixels())])
         strip.show()
-        time.sleep(0.1)
 
 
 
@@ -139,11 +153,9 @@ class Note:
         self.stop += starttime  # end of note press
         self.spl = spl  # seconds per led (one led = one eighth note or 1/2 beat)
         # Random color per note idea (unfinished)
-        '''
         rcol = random()
         r,g,b = [int(256*i) for i in colorsys.hls_to_rgb(rcol,0.5,1.0)] 
         self.color = Color(r, g, b)
-        '''
         self.color = Color(255, 255, 255)
         # used by rendering
         self.laststart = 7
@@ -160,7 +172,7 @@ class Note:
             return True
 
         self.renderLED(self.start, self.laststart, self.color, True)
-        self.renderLED(self.stop, self.laststop, Color(0, 0, 0), False)
+        self.renderLED(self.stop, self.laststop, 0, False)
 
         return True
 
@@ -177,14 +189,14 @@ class Note:
             absLED = 0
 
         for ledind in xrange(absLED, lastnote + 1):
-            if self.flipped:
+            if not self.flipped:
                 self.strip.setPixelColor(7 - ledind + self.offset, color)
             else:
                 self.strip.setPixelColor(ledind + self.offset, color)
 
         if absLED > 0:
             cval = int(256 * remLED)
-            if self.flipped:
+            if not self.flipped:
                 self.strip.setPixelColor(7 - (absLED - 1) + self.offset, Color(cval, cval, cval))
             else:
                 self.strip.setPixelColor(absLED - 1 + self.offset, Color(cval, cval, cval))
