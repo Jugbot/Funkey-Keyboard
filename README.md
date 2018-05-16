@@ -16,8 +16,5 @@ Check out the [video demonstration](https://youtu.be/wlrPzlZg1Dw).
 ## Hardware
 ___
 
-Video demonstration:
-
-
 ![Image of ortho explode view](/images/explode.png)
 
