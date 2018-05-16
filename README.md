@@ -9,9 +9,10 @@ This was a project for New York University's prototyping design class (EG1003) f
 Video demonstration:
 [![Image not found, but the video link is still here!](https://img.youtube.com/vi/wlrPzlZg1Dw/0.jpg)](https://youtu.be/wlrPzlZg1Dw)
 
-![]()
+![Image of ortho explode view](/images/explode.png)
 
 ## Dependencies:
 + pyllist
 + python-midi
 + adafruit-gpio
+
