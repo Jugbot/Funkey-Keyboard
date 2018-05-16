@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Funkey-Keyboard.iml" filepath="$PROJECT_DIR$/.idea/Funkey-Keyboard.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Letter-Bitmap-Dictionary/.idea/texttodictionary.iml" filepath="$PROJECT_DIR$/../Letter-Bitmap-Dictionary/.idea/texttodictionary.iml" />
-    </modules>
-  </component>
-</project>
