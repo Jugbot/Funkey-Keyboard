@@ -6,14 +6,17 @@ This was a project for New York University's prototyping design class (EG1003) f
 | :--- | :--- |
 | Unimplemented | - Tempo must be input manually (bpm variable in code)<br>- The circuit board for the buttons failed, so input recording and scoring was not able to be tested<br>- As such the menu with scrolling text is not used in the last release and songs must be set beforehand in-code |
 
+## Dependencies:
++ pyllist
++ python-midi
++ adafruit-gpio
+
+<p align="center">Harware</p>
+___
+
 Video demonstration:
 
 [![Image not found, but the video link is still here!](https://img.youtube.com/vi/wlrPzlZg1Dw/0.jpg)](https://youtu.be/wlrPzlZg1Dw)
 
 ![Image of ortho explode view](/images/explode.png)
-
-## Dependencies:
-+ pyllist
-+ python-midi
-+ adafruit-gpio
 
