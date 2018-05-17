@@ -2,6 +2,8 @@
 ### A piano with a built-in rhythm game! 
 This was a project for New York University's prototyping design class (EG1003) for spring of 2018. The design won the Nick Russo Award and the I2E Award for Innovation.  
 
+The idea behind this prototype was to make learning the piano easier by turning it into a sort of rhythm game. Other similar solutions exist out there such as [pianos that light up the next keys](https://www.smartpiano.com/) or tablet apps that record audio from an existing piano and use it as an input for a a [game-like learning tool](https://www.synthesiagame.com/).
+
 Check out the [video demonstration](https://youtu.be/wlrPzlZg1Dw).
 
 | Implemented | <ul><li>Automatic conversion of midi files to playable songs</li><li>Real time playback</li><li>Pseudo-random color change for differentiating notes</li></ul> |
