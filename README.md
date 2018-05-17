@@ -4,9 +4,9 @@ This was a project for New York University's prototyping design class (EG1003) f
 
 Check out the [video demonstration](https://youtu.be/wlrPzlZg1Dw).
 
-| Implemented | - Automatic conversion of midi files to playable songs<br>- Real time playback<br>- Pseudo-random color change for differentiating notes |
+| Implemented | <ul><li>Automatic conversion of midi files to playable songs</li><li>Real time playback</li><li>Pseudo-random color change for differentiating notes</li></ul> |
 | :--- | :--- |
-| Unimplemented | - Tempo must be input manually (bpm variable in code)<br>- The circuit board for the buttons failed, so input recording and scoring was not able to be tested<br>- As such the menu with scrolling text is not used in the last release and songs must be set beforehand in-code |
+| Unimplemented | <ul><li>Tempo must be input manually (bpm variable in code)</li><li>The circuit board for the buttons failed, so input recording and scoring was not able to be tested</li><li>As such the menu with scrolling text is not used in the last release and songs must be set beforehand in-code</li></ul> |
 
 ## Dependencies:
 + pyllist
