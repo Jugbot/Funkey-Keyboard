@@ -13,9 +13,11 @@ Check out the [video demonstration](https://youtu.be/wlrPzlZg1Dw).
 + python-midi
 + adafruit-gpio
 
-## Hardware
 ___
+## Hardware
 I used the [ws2811 addressable rgb led string](http://a.co/irZiaNd) as a display.
-For the inputs I decided to use [mcp23017 io port expander] to demonstrate the possibility of modularity. 
+
+For the inputs I decided to use [mcp23017 io port expander](https://www.adafruit.com/product/732) to demonstrate the possibility of modularity. 
+
 ![Image of ortho explode view](/images/explode.png)
 
