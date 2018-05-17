@@ -24,3 +24,7 @@ For the inputs I decided to use [mcp23017 io port expander](https://www.adafruit
   <img src="/images/schematic.jpg" alt="Image of pcb board" width="49%" />
   <img src="/images/pcb.jpg" alt="Image of electrical schematic" width="49%" /> 
 </p>
+
+Button Input/ LED Mount | Electrical Schematic 
+----------------------- | -------------------- 
+<img src="/images/pcb.jpg" alt="Image of pcb board" /> | <img src="/images/schematic.jpg" alt="Image of electrical schematic" />
